@@ -16,7 +16,7 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
   (minimal, toned down compared to my previous project)
 - Reflections
 - Post-processing  
-  (TAA + sharpening, tonemapping instead of gamma correction, DOF, motion blur)
+  (TAA + sharpening, DOF, motion blur)
 - Multiple performance profiles  
   (Low / Medium / High)
 - Volumetric light / god rays
