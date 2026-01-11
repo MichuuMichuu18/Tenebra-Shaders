@@ -36,12 +36,43 @@ vec3 uncharted2_filmic(vec3 v)
     return curr * white_scale;
 }
 
+vec3 tonemapLottes(vec3 x) {
+    const float a = 1.6;
+    const float d = 0.977;
+    const float hdrMax = 8.0;
+    const float midIn = 0.18;
+    const float midOut = 0.267;
+
+    float b = (-pow(midIn, a) + pow(hdrMax, a) * midOut) /
+              ((pow(hdrMax, a) - pow(midIn, a)) * midOut);
+    float c = (pow(hdrMax, a) * pow(midIn, a) - pow(hdrMax, a) * midOut * pow(midIn, a)) /
+              ((pow(hdrMax, a) - pow(midIn, a)) * midOut);
+
+    return pow(x, vec3(a)) / (pow(x, vec3(a)) + vec3(b)) + c;
+}
+
+vec3 tonemapACES(vec3 x) {
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
+vec3 tonemapSoft(vec3 x) {
+    x = max(vec3(0.0), x);
+    return x * (1.0 + x / 2.0) / (1.0 + x);
+}
+
+vec3 tonemapFilmic(vec3 x) {
+    return x / (1.0 + x);
+}
+
 void main() {
 	color = texture(colortex0, texcoord);
 	// convert colors to logarithmic scale cuz we ended our work and we want to display in sRGB (gamma correction)
-	color.rgb = pow(color.rgb, vec3(1.0 / 2.2));
-	//color.rgb = uncharted2_filmic(color.rgb); // it's giving me nostalgia feelings
-	//color.rgb = pow(color.rgb, vec3(2.2)); // convert colors to linear scale cuz we work with lighting
-	//float grayscale = dot(color.rgb, vec3(1.0/3.0));
-	//color.rgb = vec3(grayscale);
+	//color.rgb = pow(color.rgb, vec3(1.0 / 2.2));
+	color.rgb = tonemapFilmic(color.rgb*4.0);
 }

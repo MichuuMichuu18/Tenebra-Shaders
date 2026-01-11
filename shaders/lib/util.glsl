@@ -1,3 +1,11 @@
+#ifndef UTIL_GLSL
+#define UTIL_GLSL
+
+// Golden angle in radians
+#define GOLDEN_ANGLE 2.39996323; // pi * (3 - sqrt(5))
+
+#define EPSILON 1e-3
+
 // this function applies a projection matrix and then divides by the w component, skipping clip space.
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
   vec4 homPos = projectionMatrix * vec4(position, 1.0);
@@ -14,3 +22,13 @@ vec4 getNoise(vec2 coord){
 float interleavedGradientNoise(vec2 pixel) {
     return fract(52.9829189 * fract(0.06711056 * pixel.x + 0.00583715 * pixel.y));
 }
+
+// Vogel disk sampling
+vec2 vogelDiskSample(int i, int n, float rand) {
+    float r = sqrt((float(i) + rand) / float(n));
+    float theta = float(i) * GOLDEN_ANGLE;
+	theta += rand;
+    return r * vec2(cos(theta), sin(theta));
+}
+
+#endif
