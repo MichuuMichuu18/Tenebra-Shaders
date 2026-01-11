@@ -1,7 +1,7 @@
 # Tenebra Shaders
 A new Minecraft shaderpack focused on mood, simplicity, and restraint.
 
-Designed for **Minecraft 1.17+**. Always tested on the latest version — backward compatibility is not a priority.
+Designed for **Minecraft 1.17+**. Always tested on the latest version with Iris — backward compatibility (including OptiFine) is not a priority.
 
 This project emphasizes **clarity and intention**, rather than stacking effects “just because”.
 
@@ -20,6 +20,7 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - Multiple performance profiles  
   (Low / Medium / High)
 - Volumetric light / god rays
+- Fog behind translucent objects
 
 ## Known issues
 - Shadow filtering darkens sun/moon light  
