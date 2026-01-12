@@ -6,6 +6,10 @@
 
 #define EPSILON 1e-3
 
+float saturate(float x) {
+	return clamp(x, 0.0, 1.0);
+}
+
 // this function applies a projection matrix and then divides by the w component, skipping clip space.
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
   vec4 homPos = projectionMatrix * vec4(position, 1.0);
@@ -29,6 +33,13 @@ vec2 vogelDiskSample(int i, int n, float rand) {
     float theta = float(i) * GOLDEN_ANGLE;
 	theta += rand;
     return r * vec2(cos(theta), sin(theta));
+}
+
+// Converts a screen-space position (with depth) into view-space coordinates.
+vec3 screenToView(vec3 screenPos) {
+	vec4 ndcPos = vec4(screenPos, 1.0) * 2.0 - 1.0;
+	vec4 tmp = gbufferProjectionInverse * ndcPos;
+	return tmp.xyz / tmp.w;
 }
 
 #endif

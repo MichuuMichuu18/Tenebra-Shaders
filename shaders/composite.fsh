@@ -82,7 +82,6 @@ void main() {
 		vec3 lightVector = normalize(shadowLightPosition); // normalizing position (values -1.0-1.0 -> 0.0-1.0)
 		vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector; 
 		
-		// lots of magic, but anyway - lets render shadow for sunlight
 		vec3 NDCPos = vec3(texcoord.xy, depthFull) * 2.0 - 1.0;
 		vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos);
 		vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
@@ -100,5 +99,6 @@ void main() {
 		vec3 light = blocklight + skylight + ambient + mix(moonlightColor, sunlightColor, dayFactor) * sunlight;	
 
 		color.rgb *= light;
+		color.rgb *= 0.5+dayFactor; // increase brightness of objects visible through water and stained glass
 	}
 }

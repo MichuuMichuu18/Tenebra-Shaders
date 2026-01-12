@@ -8,10 +8,10 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 ## Features
 - Realistic shadow rendering  
   (transparency handling, variable penumbra filtering, etc.)
+- Custom sky
 
 ## Planned
-- Sky  
-  (2D semi-realistic clouds, custom colors, sun rendering)
+- 2D Clouds
 - Bloom  
   (minimal, toned down compared to my previous project)
 - Reflections
@@ -20,9 +20,10 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - Multiple performance profiles  
   (Low / Medium / High)
 - Volumetric light / god rays
-- Fog behind translucent objects
 
 ## Known issues
 - Shadow filtering darkens sun/moon light  
   *(this may haunt me forever)*
+- Translucent objects can be brigter in some scenarios
+- PCSS shadows are costly when faraway geometry (e.g., mountains) casts shadow
 

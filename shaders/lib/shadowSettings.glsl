@@ -1,6 +1,10 @@
 #ifndef SHADOWSETTINGS_GLSL
 #define SHADOWSETTINGS_GLSL
 
+const bool shadowtex0Nearest = true;
+const bool shadowtex1Nearest = true;
+const bool shadowcolor0Nearest = true;
+
 const int shadowMapResolution = 2048;
 
 // maximum samples amount to use for PCSS blurring (Vogel disc samples)

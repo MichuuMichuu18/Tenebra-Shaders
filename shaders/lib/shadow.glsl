@@ -95,7 +95,7 @@ vec3 getPCSSShadow(vec4 shadowClipPos) {
     if (blockerDepth < 0.0) return vec3(1.0); // skip if fully lit
 
     float penumbra = (shadowUVZ.z - blockerDepth) / blockerDepth;
-    float filterRadius = penumbra * LIGHT_RADIUS;
+    float filterRadius = max(1.0, penumbra * LIGHT_RADIUS);
 
 	// adaptive sample count based on penumbra
     int samples = SHADOW_SAMPLES;
@@ -105,7 +105,7 @@ vec3 getPCSSShadow(vec4 shadowClipPos) {
 	
 	float totalWeight = 0.0;
 	// adaptive sample count based on distance
-	int pcfSamples = int(mix(12.0, samples, clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
+	int pcfSamples = int(mix(9.0, samples, clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
     float weightCoeff = (2.0 * filterRadius*filterRadius);
     for (int i = 0; i < pcfSamples; i++) {
         vec2 offset = vogelDiskSample(i, pcfSamples, noise)
