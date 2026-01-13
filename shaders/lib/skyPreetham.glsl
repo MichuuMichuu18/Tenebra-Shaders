@@ -21,12 +21,12 @@ vec3 calcFogColor(vec3 viewDir, vec3 sunDir) {
     float sunHeight = dot(sunDir, up); // raw, can be negative at night
 
     // Base daytime fog: soft pale yellow
-    vec3 dayFog = vec3(0.8, 0.9, 1.0) * 0.8;
+    vec3 dayFog = vec3(0.6, 0.8, 1.0) * 0.9;
 
     // Sunset/sunrise factor
     // Only when sun is low, i.e., sunHeight near horizon
     float sunLow = smoothstep(0.0, 0.25, 0.25 - sunHeight); // 0 when high, 1 near horizon
-    vec3 sunsetFog = vec3(1.0, 0.35, 0.1); // warm tangerine
+    vec3 sunsetFog = vec3(1.0, 0.35, 0.2); // warm tangerine
 
     // Horizon blend: stronger near horizon
     float horizonBlend = pow(1.0 - viewUp, 1.5);
@@ -53,7 +53,7 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
 	float sunView = dot(viewDir, sunDir);
 
 	// Base colors
-	vec3 zenithColor  = skyColor * 0.85;
+	vec3 zenithColor  = skyColor * 0.75;
 	vec3 horizonColor = calcFogColor(viewDir, sunDir);
 
 	// Preetham-style vertical gradient
