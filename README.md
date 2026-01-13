@@ -11,7 +11,6 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - Custom sky
 
 ## Planned
-- 2D Clouds
 - Bloom  
   (minimal, toned down compared to my previous project)
 - Reflections
@@ -22,8 +21,8 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - Volumetric light / god rays
 
 ## Known issues
-- Shadow filtering darkens sun/moon light  
-  *(this may haunt me forever)*
+- Shadow filtering darkens sun/moon light
 - Translucent objects can be brigter in some scenarios
 - PCSS shadows are costly when faraway geometry (e.g., mountains) casts shadow
+- Cloud shading does not respond correctly to the sun’s screen-space position
 
