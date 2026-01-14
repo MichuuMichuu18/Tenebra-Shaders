@@ -6,6 +6,10 @@
 
 #define EPSILON 1e-3
 
+float luminance(vec3 color) {
+    return dot(color, vec3(0.2125, 0.7153, 0.0721));
+}
+
 float saturate(float x) {
 	return clamp(x, 0.0, 1.0);
 }

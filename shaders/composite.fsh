@@ -4,7 +4,7 @@
 
 composite.fsh
 
-in this program we calculate lighting which will be visible on stained glass and water
+in this program we calculate lighting which will be only visible on stained glass and water
 
 */
 
@@ -31,7 +31,7 @@ uniform mat4 shadowProjection;
 
 uniform float viewWidth;
 uniform float viewHeight;
-
+uniform float rainStrength;
 uniform float sunAngle;
 
 uniform float far;
@@ -41,27 +41,10 @@ in vec2 texcoord;
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 color;
 
-const vec3 blocklightColor = vec3(1.0, 0.55, 0.1);
-const vec3 skylightColor = vec3(0.25, 0.3, 0.4);
-const vec3 skylightNightColor = vec3(0.02, 0.05, 0.12);
-const vec3 sunlightColor = vec3(1.0, 0.95, 0.9)*1.3;
-const vec3 moonlightColor = vec3(0.075, 0.075, 0.18);
-const vec3 ambientColor = vec3(0.01, 0.02, 0.05);
-
-const float sunPathRotation = -35.0;
-
-#define DAY_CURVE 0.333 // higher value gives us more smooth day/night transition (up to 1.0) and can make daytime and nighttime overlap too much
-
 #include "/lib/distort.glsl"
 #include "/lib/util.glsl"
 #include "/lib/shadow.glsl"
-
-float getDayFactor() {
-	float angle = sunAngle * 2.0 * 3.14159265;
-
-	// day factor: 1 at daytime, 0 at night
-	return clamp(pow(max(0.0, sin(angle)), DAY_CURVE), 0.0, 1.0);
-}
+#include "/lib/lighting.glsl"
 
 void main() {
 	color = texture(colortex0, texcoord);
@@ -88,15 +71,15 @@ void main() {
 		vec3 shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
 		vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);
 		
+		float dayFactor = getDayFactor();
 		vec3 blocklight = lightmap.r * blocklightColor;
-		vec3 skylight = lightmap.g * skylightColor;
+		vec3 skylight = lightmap.g * mix(skylightNightColor, skylightColor, dayFactor);
 		vec3 ambient = ambientColor;
 		
 		vec3 shadow = getPCSSShadow(shadowClipPos);
-		vec3 sunlight = clamp(dot(worldLightVector, normal), 0.0, 1.0) * lightmap.g * shadow; // clamp dot product to not get negative sunlight (its impossible irl duh unless we discover black holes in minecraft)
+		vec3 sunlight = clamp(dot(worldLightVector, normal), 0.0, 1.0) * lightmap.g * shadow * (1.0-0.8*rainStrength); // clamp dot product to not get negative sunlight (its impossible irl duh unless we discover black holes in minecraft)
 
-		float dayFactor = getDayFactor();
-		vec3 light = blocklight + skylight + ambient + mix(moonlightColor, sunlightColor, dayFactor) * sunlight;	
+		vec3 light = blocklight + skylight + ambient + mix(moonlightColor, calcSunColor(dayFactor), dayFactor) * sunlight;	
 
 		color.rgb *= light;
 		color.rgb *= 0.5+dayFactor; // increase brightness of objects visible through water and stained glass

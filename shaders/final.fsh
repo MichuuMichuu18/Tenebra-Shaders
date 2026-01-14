@@ -11,9 +11,7 @@ layout(location = 0) out vec4 color;
 const int colortex0Format = RGB16;
 */
 
-float luminance(vec3 color) {
-    return dot(color, vec3(0.2125, 0.7153, 0.0721));
-}
+#include "/lib/util.glsl"
 
 vec3 uncharted2_tonemap_partial(vec3 x)
 {
@@ -74,5 +72,5 @@ void main() {
 	color = texture(colortex0, texcoord);
 	// convert colors to logarithmic scale cuz we ended our work and we want to display in sRGB (gamma correction)
 	//color.rgb = pow(color.rgb, vec3(1.0 / 2.2));
-	color.rgb = tonemapFilmic(color.rgb*4.0);
+	color.rgb = tonemapFilmic(color.rgb*5.0);
 }

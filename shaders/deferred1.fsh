@@ -9,6 +9,7 @@ uniform mat4 gbufferProjectionInverse;
 uniform float far;
 
 uniform vec3 fogColor;
+uniform vec3 skyColor;
 
 uniform vec3 sunPosition;
 uniform float rainStrength;
@@ -23,7 +24,7 @@ in vec2 texcoord;
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 color;
 
-#define FOG_DENSITY 0.4
+#define FOG_DENSITY 0.2
 
 #define PREETHAM_SKY
 
@@ -52,7 +53,7 @@ void main() {
 	float fogFactor = 1.0 - exp(-fogDensity * dist);
 	
 	#ifdef PREETHAM_SKY
-	vec3 finalFogColor = calcFogColor(normalize(viewPos), normalize(sunPosition));
+	vec3 finalFogColor = pow(calcSkyColorPreetham(normalize(viewPos)), vec3(2.2));
 	#else
 	vec3 finalFogColor = fogColor;
 	#endif

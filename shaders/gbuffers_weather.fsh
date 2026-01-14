@@ -17,6 +17,7 @@ layout(location = 2) out vec4 encodedNormal;
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor;
+	color.a = clamp(color.a -0.1,0.0,1.0)*0.5;
 	//color *= texture(lightmap, lmcoord);
 	if (color.a < alphaTestRef) {
 		discard;

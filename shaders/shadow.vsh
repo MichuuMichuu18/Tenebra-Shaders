@@ -2,6 +2,7 @@
 
 out vec2 texcoord;
 out vec4 glcolor;
+out float block;
 
 #include "/lib/distort.glsl"
 

@@ -9,10 +9,12 @@ uniform mat4 gbufferModelViewInverse;
 uniform vec3 fogColor;
 uniform vec3 skyColor;
 uniform vec3 sunPosition;
+uniform float eyeAltitude;
 uniform float rainStrength;
 uniform sampler2D noisetex;
 uniform float frameTimeCounter;
 uniform sampler2D colortex7;
+uniform float sunAngle;
 uniform float far;
 in vec4 glcolor;
 
@@ -21,10 +23,11 @@ in vec4 glcolor;
 #define PREETHAM_SKY
 #define 2D_CLOUDS
 
-#define FOG_DENSITY 0.4
+#define FOG_DENSITY 0.3
 
 #ifdef PREETHAM_SKY
 #include "/lib/skyPreetham.glsl"
+#include "/lib/lighting.glsl"
 #else
 #include "/lib/skyVanilla.glsl"
 #endif
@@ -46,11 +49,13 @@ void main() {
         // sky color
         #ifdef PREETHAM_SKY
         vec3 skyCol = calcSkyColorPreetham(pos);
+        float dayFactor = getDayFactor();
+        vec3 sunColor = calcSunColor(dayFactor);
+        vec3 sun = calcSunDisc(pos)*sunColor;
+        color = vec4(skyCol+sun, 1.0);
         #else
-        vec3 skyCol = calcSkyColor(pos);
+        color = vec4(calcSkyColor(pos), 1.0);
         #endif
-        
-        color = vec4(skyCol, 1.0);
 	
 	#ifdef 2D_CLOUDS
 	// Transform direction to world space

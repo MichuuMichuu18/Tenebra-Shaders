@@ -47,7 +47,7 @@ vec3 getPCSSShadow(vec4 clipPos){
 
 	// shadow UVZ
 	vec4 dClip = clipPos;
-	dClip.z -= 0.001*(distance+1.0);
+	dClip.z -= 0.00075*(distance+1.0);
 	dClip.xyz = distortShadowClipPos(dClip.xyz);
 	vec3 uvz = dClip.xyz / dClip.w * 0.5 + 0.5;
 

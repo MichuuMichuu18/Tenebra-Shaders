@@ -6,9 +6,12 @@ Designed for **Minecraft 1.17+**. Always tested on the latest version with Iris 
 This project emphasizes **clarity and intention**, rather than stacking effects “just because”.
 
 ## Features
-- Realistic shadow rendering  
-  (transparency handling, variable penumbra filtering, etc.)
-- Custom sky
+- **Dynamic skies**
+- **Natural lighting**
+- **2D clouds**
+- **Subtle fog & haze**
+- **Soft shadows**
+- **FXAA (anti-aliasing)** (improved from previous project)
 
 ## Planned
 - Bloom  
@@ -21,6 +24,5 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - Volumetric light / god rays
 
 ## Known issues
-- Translucent objects can be brigter in some scenarios
-- Clouds don't respect daytime changes yet
+ *continuously looking for issues*
 
