@@ -22,4 +22,5 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 
 ## Known issues
 - Translucent objects can be brigter in some scenarios
+- Clouds don't respect daytime changes yet
 
