@@ -11,8 +11,8 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - **2D clouds**
 - **Subtle fog & haze**
 - **Soft shadows**
-- **FXAA (anti-aliasing)** (improved from previous project)
-- **Motion blur** (improved from previous project)
+- **Anti-aliasing (FXAA)**
+- **Motion blur**
 
 ## Planned
 - Bloom  

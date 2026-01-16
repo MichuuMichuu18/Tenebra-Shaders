@@ -8,11 +8,10 @@ uniform float viewHeight;
 in vec2 texcoord;
 
 #define FXAA
-#define FXAA_EDGE_THRESHOLD 0.031
-#define FXAA_MIN_LUMA	    0.005
-
 // FXAA pixel span, 8.0 - sharp but sometimes not smooth enough, 16.0 - smooth but sometimes not sharp enough
-#define FXAA_SPAN_MAX	   12.0
+#define FXAA_SPAN_MAX	     12.0
+#define FXAA_EDGE_THRESHOLD  0.031
+#define FXAA_MIN_LUMA	     0.005
 
 // you probably don't want to touch these
 #define FXAA_REDUCE_MUL	 (1.0 / 8.0)
@@ -52,7 +51,7 @@ void main() {
 		// skip FXAA if no strong edge
 		if(lumaRange > FXAA_EDGE_THRESHOLD) {
 			vec2 dir = vec2(-(lumaNW + lumaNE - lumaSW - lumaSE),
-							 lumaNW + lumaSW - lumaNE - lumaSE); // compute blur direction
+			                  lumaNW + lumaSW - lumaNE - lumaSE); // compute blur direction
 
 			float lumaSum = lumaNW + lumaNE + lumaSW + lumaSE;
 			float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + max(lumaSum * (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN));

@@ -11,13 +11,13 @@ const float shadowDistanceRenderMul = 1.0;
 const float ambientOcclusionLevel = 0.5;
 
 // maximum samples amount to use for PCSS blurring (Vogel disc samples)
-#define SHADOW_SAMPLES 32   // 12 = minimum, 16 = cheap, 32 = good, 64 = very soft
+#define SHADOW_SAMPLES 16 // 64 = very soft, 32 = okay, 16 = trying to look okay
 
 // penumbra distance and blur detection settings, can be left on low values as it is
 const int BLOCKER_SAMPLES = 8;
 const float BLOCKER_RADIUS = 32.0; // in shadow map texels
 
 #define LIGHT_RADIUS 128.0
-#define MAX_DISTANCE 128.0 // probably needs tweaking but idk
+#define MAX_DISTANCE 384.0 // scale PCSS samples from SHADOW_SAMPLES down to 16.0 based on distance
 
 #endif

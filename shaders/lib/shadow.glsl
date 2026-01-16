@@ -22,13 +22,13 @@ vec3 getShadow(vec3 uvz) {
 }
 
 // find average blocker depth
-float findBlockerDepth(vec3 uvz, int maxSamples){
+float findBlockerDepth(vec3 uvz, int maxSamples, float noise){
 	float avg = 0.0;
 	int count = 0;
 	float texel = 1.0 / float(shadowMapResolution);
 
 	for(int i=0; i<maxSamples; i++){
-		vec2 offset = vogelDiskSample(i, maxSamples, interleavedGradientNoise(gl_FragCoord.xy)) * BLOCKER_RADIUS * texel;
+		vec2 offset = vogelDiskSample(i, maxSamples, noise) * BLOCKER_RADIUS * texel;
 		float d = texture(shadowtex0, uvz.xy + offset).r;
 		if(d < uvz.z){
 			avg += d;
@@ -56,7 +56,7 @@ vec3 getPCSSShadow(vec4 clipPos){
 
 	// blocker search
 	int blockerSamples = int(mix(8.0, BLOCKER_SAMPLES, clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
-	float blockerDepth = findBlockerDepth(uvz, blockerSamples);
+	float blockerDepth = findBlockerDepth(uvz, blockerSamples, noise);
 	if(blockerDepth < 0.0) return vec3(1.0); // fully lit
 
 	// penumbra
@@ -66,14 +66,15 @@ vec3 getPCSSShadow(vec4 clipPos){
 
 	// PCF samples: fewer for far geometry
 	int baseSamples = SHADOW_SAMPLES;
-	int pcfSamples = int(mix(9.0, float(baseSamples), clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
+	int pcfSamples = int(mix(float(baseSamples), 16.0, clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
 
 	// accumulate
 	vec3 shadow = vec3(0.0);
 	float weightTotal = 0.0;
 	
 	// pre-calculate weight coefficient
-	float weightCoeff = 2.0 * filterRadius * filterRadius;
+	// (actually just -2.0 might be better, because this ensures more samples = more detail)
+	float weightCoeff = -2.0; // 2.0 * filterRadius * filterRadius;
 
 	for(int i=0; i<pcfSamples; i++){
 		vec2 offset = vogelDiskSample(i, pcfSamples, noise) * filterRadius / float(shadowMapResolution);
