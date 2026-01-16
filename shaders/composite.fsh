@@ -72,7 +72,7 @@ void main() {
 		vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);
 		
 		float dayFactor = getDayFactor();
-		vec3 blocklight = lightmap.r * blocklightColor;
+		vec3 blocklight = lightmap.r * blocklightColor * (1.0-0.7*dayFactor);
 		vec3 skylight = lightmap.g * mix(skylightNightColor, skylightColor, dayFactor);
 		vec3 ambient = ambientColor;
 		

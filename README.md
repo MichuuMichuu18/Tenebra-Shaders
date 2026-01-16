@@ -12,13 +12,14 @@ This project emphasizes **clarity and intention**, rather than stacking effects 
 - **Subtle fog & haze**
 - **Soft shadows**
 - **FXAA (anti-aliasing)** (improved from previous project)
+- **Motion blur** (improved from previous project)
 
 ## Planned
 - Bloom  
   (minimal, toned down compared to my previous project)
 - Reflections
 - Post-processing  
-  (TAA + sharpening, DOF, motion blur)
+  (TAA + sharpening, DOF)
 - Multiple performance profiles  
   (Low / Medium / High)
 - Volumetric light / god rays

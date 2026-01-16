@@ -45,7 +45,7 @@ vec4 renderClouds(vec3 cloudPos) {
 	float dist = length(lightVec2D);
 	vec3 lightDir = normalize(vec3(lightVec2D.x, 0.6, lightVec2D.y));
 
-	float lightSoftness = 0.6; // tweakable
+	float lightSoftness = 0.8; // tweakable
 	float NdotL = saturate(dot(normal, lightDir) + lightSoftness);
 	float attenuation = exp(-dist * 0.001);
 	float light = NdotL * attenuation;

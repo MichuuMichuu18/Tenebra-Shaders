@@ -5,21 +5,24 @@
 #include "/lib/distort.glsl"
 #include "/lib/util.glsl"
 
-// basic shadow sample
-vec3 getShadow(vec3 uvz){
-	float trans = step(uvz.z, texture(shadowtex0, uvz.xy).r);
-	if(trans >= 1.0) return vec3(1.0);
+// optimized shadow sample
+vec3 getShadow(vec3 uvz) {
+    float shadow0 = texture(shadowtex0, uvz.xy).r;
+    float shadow1 = texture(shadowtex1, uvz.xy).r;
 
-	float opaque = step(uvz.z, texture(shadowtex1, uvz.xy).r);
-	if(opaque <= 0.0) return vec3(0.0);
+    // is it behind the transparent layer?
+    float isLit = step(uvz.z, shadow0);
+    // is it behind the opaque layer?
+    float isBlocked = step(shadow1, uvz.z);
 
-	vec4 col = texture(shadowcolor0, uvz.xy);
-	return col.rgb * (1.0 - col.a);
+    vec4 col = texture(shadowcolor0, uvz.xy);
+    vec3 tintedShadow = col.rgb * (1.0 - col.a);
+    
+    return mix(mix(tintedShadow, vec3(0.0), isBlocked), vec3(1.0), isLit);
 }
 
 // find average blocker depth
 float findBlockerDepth(vec3 uvz, int maxSamples){
-	float depth = uvz.z;
 	float avg = 0.0;
 	int count = 0;
 	float texel = 1.0 / float(shadowMapResolution);
@@ -27,7 +30,7 @@ float findBlockerDepth(vec3 uvz, int maxSamples){
 	for(int i=0; i<maxSamples; i++){
 		vec2 offset = vogelDiskSample(i, maxSamples, interleavedGradientNoise(gl_FragCoord.xy)) * BLOCKER_RADIUS * texel;
 		float d = texture(shadowtex0, uvz.xy + offset).r;
-		if(d < depth){
+		if(d < uvz.z){
 			avg += d;
 			count++;
 		}
@@ -68,11 +71,13 @@ vec3 getPCSSShadow(vec4 clipPos){
 	// accumulate
 	vec3 shadow = vec3(0.0);
 	float weightTotal = 0.0;
+	
+	// pre-calculate weight coefficient
 	float weightCoeff = 2.0 * filterRadius * filterRadius;
 
 	for(int i=0; i<pcfSamples; i++){
 		vec2 offset = vogelDiskSample(i, pcfSamples, noise) * filterRadius / float(shadowMapResolution);
-		float w = exp(-dot(offset, offset)/weightCoeff);
+		float w = exp(dot(offset, offset)*weightCoeff);
 		shadow += getShadow(vec3(clamp(uvz.xy + offset, 0.0, 1.0), uvz.z)) * w;
 		weightTotal += w;
 	}
