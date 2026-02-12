@@ -1,14 +1,19 @@
 #ifndef SHADOWSETTINGS_GLSL
 #define SHADOWSETTINGS_GLSL
 
-// disable shadow filtering
-//const bool shadowtex0Nearest = true;
-//const bool shadowtex1Nearest = true;
-//const bool shadowcolor0Nearest = true;
+const bool shadowHardwareFiltering0 = true;
+const bool shadowtex0Mipmap = false; // turning on mipmaps makes shadows blocky/glitchy!!!
+const bool shadowtex0Nearest = false;
+const bool shadowtex1Mipmap = false;
+const bool shadowtex1Nearest = false;
+const bool shadowcolor0Mipmap = false;
+const bool shadowcolor0Nearest = false;
 
 const int shadowMapResolution = 2048;
 const float shadowDistanceRenderMul = 1.0;
 const float ambientOcclusionLevel = 0.5;
+
+#define SHADOW_PCSS_FILTERING
 
 // maximum samples amount to use for PCSS blurring (Vogel disc samples)
 #define SHADOW_SAMPLES 16 // 64 = very soft, 32 = okay, 16 = trying to look okay

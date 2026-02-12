@@ -54,7 +54,7 @@ void main() {
         vec3 sun = calcSunDisc(pos)*sunColor;
         color = vec4(skyCol+sun, 1.0);
         #else
-        color = vec4(calcSkyColor(pos), 1.0);
+        color = vec4(calcSkyColor(pos)*1.5, 1.0);
         #endif
 	
 	#ifdef 2D_CLOUDS

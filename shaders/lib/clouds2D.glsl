@@ -19,7 +19,6 @@ vec4 renderClouds(vec3 cloudPos) {
 	float noise1 = texture(noisetex, cloudUV * 0.05).r;
 	float noise2 = texture(noisetex, cloudUV * 0.2).r;
 
-
 	float density = shape;
 	density -= mid * 0.35;
 	density -= detail * 0.15;
@@ -45,7 +44,7 @@ vec4 renderClouds(vec3 cloudPos) {
 	float dist = length(lightVec2D);
 	vec3 lightDir = normalize(vec3(lightVec2D.x, 0.6, lightVec2D.y));
 
-	float lightSoftness = 0.8; // tweakable
+	float lightSoftness = 0.4; // tweakable
 	float NdotL = saturate(dot(normal, lightDir) + lightSoftness);
 	float attenuation = exp(-dist * 0.001);
 	float light = NdotL * attenuation;
@@ -55,11 +54,21 @@ vec4 renderClouds(vec3 cloudPos) {
 
 	float dayFactor = getDayFactor();
 
-	vec3 cloudLight = vec3(0.9) * mix(moonlightColor+0.2, calcSunColor(dayFactor)*0.7+0.3, dayFactor);
-	vec3 cloudDark  = vec3(0.85, 0.88, 0.92) * (0.5+0.5*dayFactor);
-	vec3 clouds = mix(cloudDark, cloudLight, density) * (1.0-0.5*rainStrength);
+	// Cloud material (albedo)
+	vec3 cloudAlbedoLight = vec3(0.85);
+	vec3 cloudAlbedoDark  = vec3(0.65);
 
-	clouds = mix(clouds * 0.4, clouds, light);
+	
+	float sunTerm = light;              // directional sunlight
+	vec3 skyTerm = mix(skylightNightColor*3.0, skylightColor, dayFactor);
+
+	vec3 sunLight = mix(moonlightColor*6.0, calcSunColor(dayFactor), dayFactor) * sunTerm;
+	vec3 totalLight = (sunLight + skyTerm) / 5.0;
+
+	vec3 clouds =
+	    mix(cloudAlbedoDark, cloudAlbedoLight, density)
+	    * totalLight
+	    * (1.0 - 0.5 * rainStrength);
 
 	return vec4(clouds, saturate(density * fogFactor));
 }

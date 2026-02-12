@@ -43,7 +43,7 @@ vec3 getPCSSShadow(vec4 clipPos){
 	float noise = interleavedGradientNoise(gl_FragCoord.xy);
 
 	// transform to NDC / view space
-	float depth = texture(depthtex0, texcoord).r;
+	float depth = texture(depthtex0, texcoord.xy).r;
 	vec3 NDC = vec3(texcoord.xy, depth) * 2.0 - 1.0;
 	vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDC);
 	float distance = length(viewPos) / far;
@@ -53,6 +53,8 @@ vec3 getPCSSShadow(vec4 clipPos){
 	dClip.z -= 0.00075*(distance+1.0);
 	dClip.xyz = distortShadowClipPos(dClip.xyz);
 	vec3 uvz = dClip.xyz / dClip.w * 0.5 + 0.5;
+	
+	#ifdef SHADOW_PCSS_FILTERING
 
 	// blocker search
 	int blockerSamples = int(mix(8.0, BLOCKER_SAMPLES, clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
@@ -84,6 +86,10 @@ vec3 getPCSSShadow(vec4 clipPos){
 	}
 
 	return shadow / weightTotal;
+
+	#else
+	return getShadow(uvz);
+	#endif
 }
 
 #endif

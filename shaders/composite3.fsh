@@ -1,6 +1,6 @@
 #version 330 compatibility
 
-uniform sampler2D colortex0;
+uniform sampler2D colortex5;
 
 uniform float viewWidth;
 uniform float viewHeight;
@@ -23,7 +23,8 @@ vec3 softLimit(vec3 x) {
 }
 
 void main() {
-    vec2 texel = vec2(1.0 / viewWidth, 0.0);
+
+    vec2 texel = vec2(0.0, 0.5 / viewHeight);
     vec2 uv = texcoord;
 
     vec3 sum = vec3(0.0);
@@ -33,41 +34,41 @@ void main() {
         vec3 s;
 
         // Center
-        s = texture(colortex0, uv).rgb;
+        s = texture(colortex5, uv).rgb;
         sum += softLimit(s) * 0.227027;
 
         // Near taps
-        s = texture(colortex0, uv + texel * 1.0 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv + texel * 1.0 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.1945946;
 
-        s = texture(colortex0, uv - texel * 1.0 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv - texel * 1.0 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.1945946;
 
         // Mid taps
-        s = texture(colortex0, uv + texel * 1.7 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv + texel * 1.7 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.1216216;
 
-        s = texture(colortex0, uv - texel * 1.7 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv - texel * 1.7 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.1216216;
 
         // Far taps
-        s = texture(colortex0, uv + texel * 3.0 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv + texel * 3.0 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.054054;
 
-        s = texture(colortex0, uv - texel * 3.0 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv - texel * 3.0 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.054054;
-        
+
         // Ultra-far taps (very low energy)
-        s = texture(colortex0, uv + texel * 5.0 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv + texel * 5.0 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.020;
 
-        s = texture(colortex0, uv - texel * 5.0 * BLUR_RADIUS).rgb;
+        s = texture(colortex5, uv - texel * 5.0 * BLUR_RADIUS).rgb;
         sum += softLimit(s) * 0.020;
 
         color = vec4(sum * BLUR_STRENGTH, 1.0);
 
     #else
-        color = texture(colortex0, uv);
+        color = texture(colortex5, uv);
     #endif
 }
 

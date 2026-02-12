@@ -26,6 +26,7 @@ in vec2 texcoord;
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 color;
 
+#define FOG
 #define FOG_DENSITY 0.2
 
 #define PREETHAM_SKY
@@ -36,7 +37,8 @@ layout(location = 0) out vec4 color;
 
 void main() {
 	color = texture(colortex0, texcoord);
-
+	
+	#ifdef FOG
 	float depthFull   = texture(depthtex0, texcoord).r;
 	float depthOpaque = texture(depthtex1, texcoord).r;
 
@@ -67,4 +69,5 @@ void main() {
 
 		color.rgb = mix(color.rgb, finalFogColor, clamp(fogFactor, 0.0, 1.0));
 	}
+	#endif
 }

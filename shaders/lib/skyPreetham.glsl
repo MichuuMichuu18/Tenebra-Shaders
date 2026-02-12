@@ -1,20 +1,6 @@
 #ifndef SKYPREETHAM_GLSL
 #define SKYPREETHAM_GLSL
 
-vec3 sunDisc(vec3 viewDir, vec3 sunDir) {
-	float d = dot(viewDir, sunDir);
-
-	// Disc + soft halo
-	float disc = smoothstep(0.9994, 1.0, d);
-	float halo = smoothstep(0.94-rainStrength*0.2, 1.0, d);
-
-	vec3 discColor = vec3(1.0, 0.97, 0.9);
-	vec3 haloColor = vec3(1.0, 0.95, 0.5);
-
-	return discColor * disc * 3.2 * (1.0-rainStrength) +
-	       haloColor * halo * 0.05;
-}
-
 float calcSunDisc(vec3 viewDir) {
     viewDir = normalize(viewDir);
     vec3 sunDir = normalize(sunPosition);
@@ -22,27 +8,27 @@ float calcSunDisc(vec3 viewDir) {
     float d = dot(viewDir, sunDir);
 
     // Disc + soft halo
-    float disc = smoothstep(0.9994, 1.0, d);
-    float halo = smoothstep(0.94 - rainStrength * 0.2, 1.0, d);
+    float disc = smoothstep(0.9993, 1.0, d);
+    float halo = smoothstep(0.996 - rainStrength * 0.2, 1.0, d);
+    float halo2 = smoothstep(0.993 - rainStrength * 0.2, 1.0, d);
 
     //vec3 discColor = vec3(1.0, 0.97, 0.9);
     //vec3 haloColor = vec3(1.0, 0.95, 0.5);
 
     float sun =
-	disc * 3.2 * (1.0 - rainStrength) +
-        halo * 0.05;
+	disc * 3.0 * (1.0 - rainStrength) +
+        halo * 0.01 +
+        halo2 * 0.005;
 
     return sun;
 }
-
 
 vec3 calcFogColor(vec3 viewDir, vec3 sunDir) {
     vec3 up = normalize(gbufferModelView[1].xyz);
     float viewUp = saturate(dot(viewDir, up));
     float sunHeight = dot(sunDir, up); // raw, can be negative at night
 
-    // Base daytime fog: soft pale yellow
-    vec3 dayFog = vec3(0.6, 0.8, 1.0) * 0.9;
+    vec3 dayFog = vec3(0.6, 0.8, 1.0)*0.8;
 
     // Sunset/sunrise factor
     // Only when sun is low, i.e., sunHeight near horizon
@@ -74,7 +60,7 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
     float sunView = dot(viewDir, sunDir);
 
     // Base colors
-    vec3 zenithColor  = skyColor * 0.75;
+    vec3 zenithColor  = skyColor * 0.6;
     vec3 horizonColor = calcFogColor(viewDir, sunDir);
 
     // Vertical gradient
@@ -113,8 +99,7 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
     // Absolute floor
     sky = max(sky, vec3(0.03));
 
-    return sky;
+    return sky*2.5;
 }
-
 
 #endif
