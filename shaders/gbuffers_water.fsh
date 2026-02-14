@@ -35,36 +35,34 @@ layout(location = 2) out vec4 encodedNormal;
 
 #include "/lib/util.glsl"
 
-#define PREETHAM_SKY
-#define 2D_CLOUDS
-
-#define FOG_DENSITY 0.3
-
-#ifdef PREETHAM_SKY
-#include "/lib/skyPreetham.glsl"
-#include "/lib/lighting.glsl"
-#else
-#include "/lib/skyVanilla.glsl"
-#endif
-
-#ifdef 2D_CLOUDS
-#include "/lib/clouds2D.glsl"
-#endif
+#define WATER_REFLECTIONS
+#define VANILLA_WATER
 
 void main() {
+	#ifndef VANILLA_WATER
+	lightmapData = vec4(lmcoord, 0.0, 1.0);
+	encodedNormal = vec4(normal.rgb * 0.5 + 0.5, 1.0);
+	if(normal.a == 1.0) {
+		color = vec4(0.1, 0.45, 0.6, 0.3);
+		lightmapData.xy *= 0.5;
+		lightmapData.z = 1.0; // enable refraction/waves and other water special treatments in composite
+	} else {
+		color = texture(gtexture, texcoord) * glcolor;
+		//color *= texture(lightmap, lmcoord);
+		
+		if (color.a < alphaTestRef) {
+			discard;
+		}
+	}
+	#else
 	color = texture(gtexture, texcoord) * glcolor;
 	//color *= texture(lightmap, lmcoord);
 	
 	if (color.a < alphaTestRef) {
 		discard;
 	}
-	
-	lightmapData = vec4(lmcoord, 0.0, 1.0);
+		
+	lightmapData = vec4(lmcoord, 0.0, 1.0);	
 	encodedNormal = vec4(normal.rgb * 0.5 + 0.5, 1.0);
-	
-	if(normal.a == 1.0) {
-			color = vec4(0.1, 0.45, 0.6, 0.3);
-			lightmapData.xy *= 0.5;
-			lightmapData.z = 1.0;
-	}
+	#endif
 }

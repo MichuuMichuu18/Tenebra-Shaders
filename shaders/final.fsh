@@ -19,7 +19,7 @@ uniform float viewHeight;
 in vec2 texcoord;
 
 #define SHARPENING
-#define SHARPENING_STRENGTH 1.0
+#define SHARPENING_STRENGTH 1.5 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0]
 
 /*
 const int colortex0Format = RGB16F;
@@ -56,6 +56,9 @@ void main() {
 	color = texture(colortex0, texcoord);
 	
 	#ifdef SHARPENING
-	color.rgb = contrastAdaptiveSharpen(colortex0, texcoord, 2.0 * SHARPENING_STRENGTH);
+	color.rgb = contrastAdaptiveSharpen(colortex0, texcoord, SHARPENING_STRENGTH);
 	#endif
+	
+	// avoid color banding
+	color.rgb += interleavedGradientNoise(gl_FragCoord.xy+1)*0.005;
 }

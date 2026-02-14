@@ -9,14 +9,13 @@ float calcSunDisc(vec3 viewDir) {
 
     // Disc + soft halo
     float disc = smoothstep(0.9993, 1.0, d);
+    float softdisc = smoothstep(0.9988, 1.0, d);
     float halo = smoothstep(0.996 - rainStrength * 0.2, 1.0, d);
     float halo2 = smoothstep(0.993 - rainStrength * 0.2, 1.0, d);
 
-    //vec3 discColor = vec3(1.0, 0.97, 0.9);
-    //vec3 haloColor = vec3(1.0, 0.95, 0.5);
-
     float sun =
-	disc * 3.0 * (1.0 - rainStrength) +
+	disc * 2.0 * (1.0 - rainStrength) +
+	softdisc * 0.05 +
         halo * 0.01 +
         halo2 * 0.005;
 
@@ -83,8 +82,8 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
     // Night sky
     float night = smoothstep(0.0, -0.25, sunUp);
 
-    vec3 nightZenith  = vec3(0.06, 0.1, 0.13);
-    vec3 nightHorizon = vec3(0.04, 0.07, 0.09);
+    vec3 nightZenith  = vec3(0.05, 0.07, 0.09);
+    vec3 nightHorizon = vec3(0.01, 0.045, 0.06);
 
     vec3 nightSky = mix(nightHorizon, nightZenith, pow(viewUp, 0.85));
     sky = mix(sky, nightSky * 2.0, night);

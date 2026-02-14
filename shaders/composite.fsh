@@ -4,7 +4,7 @@
 
 composite.fsh
 
-in this program we calculate lighting which will be only visible on stained glass and water
+in this program we calculate lighting which will be only visible on stained glass and water and reflections
 
 */
 
@@ -47,6 +47,8 @@ uniform vec3 sunPosition;
 uniform float far;
 
 in vec2 texcoord;
+in float dayFactor;
+in vec3 sunColor;
 
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 color;
@@ -56,8 +58,9 @@ layout(location = 0) out vec4 color;
 #include "/lib/shadow.glsl"
 #include "/lib/lighting.glsl"
 
+#define WATER_REFLECTIONS
 #define PREETHAM_SKY
-#define 2D_CLOUDS
+#define CLOUDS_2D
 
 #define FOG_DENSITY 0.3
 
@@ -68,7 +71,7 @@ layout(location = 0) out vec4 color;
 #include "/lib/skyVanilla.glsl"
 #endif
 
-#ifdef 2D_CLOUDS
+#ifdef CLOUDS_2D
 #include "/lib/clouds2D.glsl"
 #endif
 
@@ -89,12 +92,12 @@ void main() {
 		vec3 encodedNormal = texture(colortex2, texcoord).rgb;
 		vec3 normal = normalize((encodedNormal - 0.5) * 2.0); // we normalize to make sure it is of unit length, normal of ours is in world space
 		vec3 lightVector = normalize(shadowLightPosition); // normalizing position (values -1.0-1.0 -> 0.0-1.0)
-		vec3 worldLightVector = gMVI * lightVector; 
-		float dayFactor = getDayFactor();
+		vec3 worldLightVector = gMVI * lightVector;
 		vec3 NDCPos = vec3(texcoord.xy, depthFull) * 2.0 - 1.0;
 		vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos);
 		vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
-
+		
+		#ifdef WATER_REFLECTIONS
 		float dist = length(viewPos) / far;
 		vec3 viewDir = normalize(screenToView(
 		    vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), 1.0)
@@ -121,7 +124,7 @@ void main() {
 		if(texture(colortex1, texcoord).b > 0.4) {
 			color = texture(colortex0, texcoord + waterWaves*0.05);
 			viewDir.xz += waterWaves*0.5;
-			feetPlayerPos.xz += waterWaves*2.0;
+			feetPlayerPos.xz += waterWaves;
 		} else {
 			color = texture(colortex0, texcoord);
 			color.rgb = pow(color.rgb, vec3(2.2));
@@ -137,18 +140,22 @@ void main() {
 		 // sky color
 		#ifdef PREETHAM_SKY
 		vec3 skyCol = calcSkyColorPreetham(reflectionDir);
-		vec3 sunColor = calcSunColor(dayFactor);
 		vec3 sun = calcSunDisc(reflectionDir)*sunColor;
 		reflectionColor = skyCol+sun;
 		#else
 		reflectionColor = calcSkyColor(reflectionDir)*1.5;
 		#endif
 		
-		#ifdef 2D_CLOUDS
+		#ifdef CLOUDS_2D
 		// Transform direction to world space
 		vec3 cloudPos = normalize(gMVI * reflectionDir);
-		vec4 clouds = renderClouds(cloudPos);
+		vec4 clouds = renderClouds(cloudPos, false);
 		reflectionColor = mix(reflectionColor.rgb, clouds.rgb, clouds.a);
+		#endif
+		
+		#else 
+		color = texture(colortex0, texcoord);
+		color.rgb = pow(color.rgb, vec3(2.2));
 		#endif
 		
 		vec3 shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
@@ -162,12 +169,14 @@ void main() {
 		vec3 shadow = getPCSSShadow(shadowClipPos);
 		vec3 sunlight = clamp(dot(worldLightVector, normal), 0.0, 1.0) * lightmap.g * shadow * (1.0-0.8*rainStrength); // clamp dot product to not get negative sunlight (its impossible irl duh unless we discover black holes in minecraft)
 
-		vec3 light = blocklight + skylight + ambient + mix(moonlightColor, calcSunColor(dayFactor), dayFactor) * sunlight;	
-
-		color.rgb *= light*0.5;
+		vec3 light = blocklight + skylight + ambient + mix(moonlightColor, sunColor, dayFactor) * sunlight;	
+		color.rgb *= light;
+		//color.rgb *= light*0.5;
 		//color.rgb *= 0.5+dayFactor; // increase brightness of objects visible through water and stained glass
 		
+		#ifdef WATER_REFLECTIONS
 		color.rgb = mix(pow(reflectionColor, vec3(2.2)), color.rgb, clamp(fresnel, 0.3, 1.0));
+		#endif
 	} else {
 		color = texture(colortex0, texcoord);
 	}

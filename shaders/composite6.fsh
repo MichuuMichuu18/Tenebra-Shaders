@@ -9,12 +9,12 @@ in vec2 texcoord;
 
 #define FXAA
 // FXAA pixel span, 8.0 - sharp but sometimes not smooth enough, 16.0 - smooth but sometimes not sharp enough
-#define FXAA_SPAN_MAX	     10.0
+#define FXAA_SPAN_MAX	     8.0
 #define FXAA_EDGE_THRESHOLD  0.02
 #define FXAA_MIN_LUMA	     0.0001
 
 // you probably don't want to touch these
-#define FXAA_REDUCE_MUL	 (1.0 / 12.0)
+#define FXAA_REDUCE_MUL	 (1.0 / 10.0)
 #define FXAA_REDUCE_MIN	 (1.0 / 128.0)
 
 #include "/lib/util.glsl"
