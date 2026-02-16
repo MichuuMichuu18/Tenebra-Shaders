@@ -1,20 +1,15 @@
 # Tenebra Shaders
-A new Minecraft shaderpack focused on mood, simplicity, and restraint.
+A Minecraft shaderpack focused on atmosphere, mood, and subtle realism.
 
-This project emphasizes **clarity and intention**, rather than stacking effects “just because”.
-
-Designed for **Minecraft 1.17+**. Always tested on the latest version with Iris — backward compatibility (including OptiFine) is not a priority.
+Always tested on the latest versions using Iris.
+Backward compatibility (including OptiFine) is not a priority.
 
 ## Features
-- **Dynamic skies**
-- **Natural lighting**
-- **2D clouds**
-- **Subtle fog & haze**
-- **Soft shadows**
-- **Anti-aliasing (FXAA)**
-- **Motion blur**
-- **Glow effect in bright places**
-- **Sky reflection in water, ice and glass**
+- Sky and atmosphere
+- Natural lighting
+- Subtle post-processing
+- Reflections on water and glass
+- Soft shadows and fog
 
 ## Planned
 - Screenspace reflections (of blocks, entities etc.)
@@ -25,6 +20,6 @@ Designed for **Minecraft 1.17+**. Always tested on the latest version with Iris 
 - Volumetric light / god rays
 
 ## Known issues
-- fresnel isn't correct,
-- jitter occurs sometimes in reflections
+- Fresnel reflections are not physically accurate
+- Occasional jitter in reflections
 
