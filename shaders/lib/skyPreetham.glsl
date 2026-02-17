@@ -11,12 +11,12 @@ float calcSunDisc(vec3 viewDir) {
 	// Disc + soft halo
 	float disc = smoothstep(0.9993, 1.0, d);
 	float softdisc = smoothstep(0.9988, 1.0, d);
-	float halo = smoothstep(0.996 - rainStrength * 0.2, 1.0, d);
-	float halo2 = smoothstep(0.993 - rainStrength * 0.2, 1.0, d);
+	float halo = smoothstep(0.996, 1.0, d);
+	float halo2 = smoothstep(0.993, 1.0, d);
 
 	float sun =
-		disc * 2.0 * (1.0 - rainStrength) +
-		softdisc * 0.05 +
+		(disc * 2.0 +
+		softdisc * 0.05) * (1.0 - rainStrength) +
 		halo * 0.01 +
 		halo2 * 0.005;
 
@@ -28,7 +28,7 @@ vec3 calcFogColor(vec3 viewDir, vec3 sunDir) {
 	float viewUp = saturate(dot(viewDir, up));
 	float sunHeight = dot(sunDir, up); // raw, can be negative at night
 
-	vec3 dayFog = vec3(0.6, 0.8, 1.0)*0.8;
+	vec3 dayFog = vec3(0.6, 0.85, 1.0)*0.8;
 
 	// Sunset/sunrise factor
 	// Only when sun is low, i.e., sunHeight near horizon
@@ -36,7 +36,7 @@ vec3 calcFogColor(vec3 viewDir, vec3 sunDir) {
 	vec3 sunsetFog = vec3(1.0, 0.35, 0.2); // warm tangerine
 
 	// Horizon blend: stronger near horizon
-	float horizonBlend = pow(1.0 - viewUp, 1.5);
+	float horizonBlend = pow(1.0 - viewUp, 2.0);
 
 	// Combine day + sunset depending on sunLow
 	vec3 fog = mix(dayFog, sunsetFog, sunLow * horizonBlend);
@@ -63,7 +63,7 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
 	vec3 horizonColor = calcFogColor(viewDir, sunDir);
 
 	// Vertical gradient
-	float horizonFactor = pow(1.0 - viewUp, 1.5);
+	float horizonFactor = pow(1.0 - viewUp, 2.0);
 	vec3 sky = mix(zenithColor, horizonColor, horizonFactor);
 
 	// Sun scattering lobe (NOT the disc)
@@ -92,9 +92,9 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
 	sky = mix(sky, vec3(dot(sky, vec3(0.299, 0.587, 0.114))), rainStrength * 0.6);
 
 	// Absolute floor
-	sky = max(sky, vec3(0.03));
+	sky = max(sky, vec3(0.05));
 
-	return sky*2.5;
+	return sky*2.2;
 }
 
 #endif

@@ -124,7 +124,7 @@ void main() {
 		vec3 sunlight = clamp(dot(worldLightVector, normal), 0.0, 1.0) * lightmap.g * shadow * (1.0 - 0.8 * rainStrength);
 
 		vec3 light = blocklight + skylight + ambientColor + mix(moonlightColor, sunColor, dayFactor) * sunlight;	
-		color.rgb *= light;
+		color.rgb *= light*0.5;
 
 		#ifdef WATER_REFLECTIONS
 		vec3 viewDir = normalize(viewPos);

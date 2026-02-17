@@ -57,7 +57,7 @@ void main() {
 	if(isEyeInWater == 1) {
 		fogDensity *= 5.0;
 	} else {
-		fogDensity *= rainStrength*2.0+1.0;
+		fogDensity *= rainStrength*4.0+1.0;
 	}
 	float fogFactor = 1.0 - exp(-fogDensity * dist);
 	

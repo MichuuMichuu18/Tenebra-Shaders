@@ -30,14 +30,14 @@ vec4 renderClouds(vec3 cloudPos, bool highQuality) {
 		density += noise2*0.015;
 	}
 	
-	density = smoothstep(0.2-rainStrength*0.2, 0.65+rainStrength*0.3, density); // cloud coverage
+	density = smoothstep(0.2-rainStrength*0.15, 0.65+rainStrength*0.3, density); // cloud coverage
 	//density /= (1.0+rainStrength);
-	density = pow(density, 1.3-rainStrength*0.75); // its not neccesary, but impacts clouds' actual density
+	density = pow(density, 1.2-rainStrength*0.75); // its not neccesary, but impacts clouds' actual density
 
 	// Compute approximate 2D normal
 	float dx = texture(colortex7, cloudUV * 0.02 + vec2(0.01, 0.0)).r - shape;
 	float dy = texture(colortex7, cloudUV * 0.02 + vec2(0.0, 0.01)).r - shape;
-	vec3 normal = normalize(vec3(-dx, 0.3, -dy));
+	vec3 normal = normalize(vec3(-dx, 0.4, -dy));
 
 	// Sun point light in cloud space
 	vec3 sunView = normalize(mat3(gbufferModelViewInverse) * sunPosition);
@@ -58,17 +58,17 @@ vec4 renderClouds(vec3 cloudPos, bool highQuality) {
 	fogFactor = saturate(fogFactor);
 
 	// Cloud material (albedo)
-	vec3 cloudAlbedoLight = vec3(0.85);
-	vec3 cloudAlbedoDark  = vec3(0.65);
-	vec3 skyTerm = mix(skylightNightColor*3.0, skylightColor, dayFactor);
+	vec3 cloudAlbedoLight = vec3(0.95);
+	vec3 cloudAlbedoDark  = vec3(0.75);
+	vec3 skyTerm = mix(skylightNightColor*15.0, skylightColor, dayFactor);
 
-	vec3 sunLight = mix(moonlightColor*6.0, sunColor, dayFactor) * sunTerm;
+	vec3 sunLight = mix(moonlightColor*6.0, mix(sunColor, vec3(10.0), rainStrength), dayFactor) * sunTerm;
 	vec3 totalLight = (sunLight + skyTerm) / 5.0;
 
 	vec3 clouds =
 	    mix(cloudAlbedoDark, cloudAlbedoLight, density)
 	    * totalLight
-	    * (1.0 - 0.5 * rainStrength);
+	    * (1.0 - 0.4 * rainStrength);
 
 	return vec4(clouds, saturate(density * fogFactor));
 }

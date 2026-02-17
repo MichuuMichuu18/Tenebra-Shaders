@@ -17,11 +17,11 @@ layout(location = 2) out vec4 encodedNormal;
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor;
-	color.a = clamp(color.a -0.1,0.0,1.0)*0.6;
+	color.a = clamp(color.a -0.2,0.0,1.0)*0.4;
 	//color *= texture(lightmap, lmcoord);
 	if (color.a < alphaTestRef) {
 		discard;
 	}
 	lightmapData = vec4(lmcoord, 0.0, 1.0);
-	encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
+	//encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
 }
