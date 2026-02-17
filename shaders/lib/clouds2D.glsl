@@ -52,7 +52,7 @@ vec4 renderClouds(vec3 cloudPos, bool highQuality) {
 	float lightSoftness = 0.6; // tweakable
 	float NdotL = saturate(dot(normal, lightDir) + lightSoftness);
 	float attenuation = exp(-dist * 0.001);
-	float light = NdotL * attenuation;
+	float sunTerm = NdotL * attenuation;
 
 	float fogFactor = exp(-FOG_DENSITY / 4.0 / max(cloudPos.y, 0.001));
 	fogFactor = saturate(fogFactor);
@@ -60,8 +60,6 @@ vec4 renderClouds(vec3 cloudPos, bool highQuality) {
 	// Cloud material (albedo)
 	vec3 cloudAlbedoLight = vec3(0.85);
 	vec3 cloudAlbedoDark  = vec3(0.65);
-	
-	float sunTerm = light;              // directional sunlight
 	vec3 skyTerm = mix(skylightNightColor*3.0, skylightColor, dayFactor);
 
 	vec3 sunLight = mix(moonlightColor*6.0, sunColor, dayFactor) * sunTerm;

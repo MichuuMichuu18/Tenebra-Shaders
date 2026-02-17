@@ -1,5 +1,13 @@
 #version 330 compatibility
 
+/*
+
+final.fsh
+
+Applying sharpening filter
+
+*/
+
 uniform sampler2D colortex0;
 uniform sampler2D colortex5;
 uniform sampler2D depthtex1;
@@ -29,24 +37,24 @@ const int colortex5Format = RGB16F;
 #include "/lib/util.glsl"
 
 vec3 contrastAdaptiveSharpen(sampler2D tex, vec2 coords, float strength) {
-    vec2 texel = 1.0 / vec2(viewWidth, viewHeight);
-    
-    vec3 a = texture(tex, coords + vec2(-texel.x, 0.0)).rgb;
-    vec3 b = texture(tex, coords + vec2(0.0, -texel.y)).rgb;
-    vec3 c = texture(tex, coords).rgb;
-    vec3 d = texture(tex, coords + vec2(0.0,  texel.y)).rgb;
-    vec3 e = texture(tex, coords + vec2( texel.x, 0.0)).rgb;
+	vec2 texel = 1.0 / vec2(viewWidth, viewHeight);
 
-    // find min and max luminance in the neighborhood
-    float minL = min(min(min(a.g, b.g), min(d.g, e.g)), c.g);
-    float maxL = max(max(max(a.g, b.g), max(d.g, e.g)), c.g);
+	vec3 a = texture(tex, coords + vec2(-texel.x, 0.0)).rgb;
+	vec3 b = texture(tex, coords + vec2(0.0, -texel.y)).rgb;
+	vec3 c = texture(tex, coords).rgb;
+	vec3 d = texture(tex, coords + vec2(0.0,  texel.y)).rgb;
+	vec3 e = texture(tex, coords + vec2( texel.x, 0.0)).rgb;
 
-    // calculate weight, lower weight in high-contrast areas to prevent artifacts
-    float weight = clamp(min(minL, 1.0 - maxL) / sqrt(maxL), 0.0, 1.0);
-    float softStrength = strength * weight;
+	// find min and max luminance in the neighborhood
+	float minL = min(min(min(a.g, b.g), min(d.g, e.g)), c.g);
+	float maxL = max(max(max(a.g, b.g), max(d.g, e.g)), c.g);
 
-    // apply the sharpen
-    return c + (c - (a + b + d + e) * 0.25) * softStrength;
+	// calculate weight, lower weight in high-contrast areas to prevent artifacts
+	float weight = clamp(min(minL, 1.0 - maxL) / sqrt(maxL), 0.0, 1.0);
+	float softStrength = strength * weight;
+
+	// apply the sharpen
+	return c + (c - (a + b + d + e) * 0.25) * softStrength;
 }
 
 /* RENDERTARGETS: 0 */
@@ -60,5 +68,5 @@ void main() {
 	#endif
 	
 	// avoid color banding
-	color.rgb += interleavedGradientNoise(gl_FragCoord.xy+1)*0.005;
+	color.rgb += interleavedGradientNoise(gl_FragCoord.xy+vec2(1,-1))*0.005;
 }

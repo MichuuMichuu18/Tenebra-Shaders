@@ -1,5 +1,13 @@
 #version 330 compatibility
 
+/*
+
+composite2.fsh
+
+Bloom 1st pass - high resolution unfortunately
+
+*/
+
 uniform sampler2D colortex0;
 
 uniform float viewWidth;

@@ -12,7 +12,6 @@ Backward compatibility (including OptiFine) is not a priority.
 - Soft shadows and fog
 
 ## Planned
-- Screenspace reflections (of blocks, entities etc.)
 - Post-processing
   (TAA, DOF)
 - Multiple performance profiles
@@ -20,6 +19,5 @@ Backward compatibility (including OptiFine) is not a priority.
 - Volumetric light / god rays
 
 ## Known issues
-- Fresnel reflections are not physically accurate
 - Occasional jitter in reflections
 

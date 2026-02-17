@@ -1,5 +1,13 @@
 #version 330 compatibility
 
+/*
+
+composite3.fsh
+
+Bloom 2nd pass
+
+*/
+
 uniform sampler2D colortex5;
 
 uniform float viewWidth;
@@ -9,6 +17,7 @@ in vec2 texcoord;
 
 #define BLOOM
 
+// probably won't allow changing those settings
 #define BLUR_RADIUS 10.0
 #define BLUR_STRENGTH 0.8
 #define BLOOM_CAP 20.0

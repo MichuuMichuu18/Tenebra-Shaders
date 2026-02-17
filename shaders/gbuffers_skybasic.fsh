@@ -26,7 +26,7 @@ in vec3 sunColor;
 #define PREETHAM_SKY
 #define CLOUDS_2D
 
-#define FOG_DENSITY 0.3
+#define FOG_DENSITY 0.2 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #ifdef PREETHAM_SKY
 #include "/lib/skyPreetham.glsl"

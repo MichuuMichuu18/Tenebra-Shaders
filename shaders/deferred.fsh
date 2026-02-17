@@ -2,9 +2,9 @@
 
 /*
 
-deferred.fsh -> composite but before rendering anything translucent
+deferred.fsh
 
-in this program we calculate lighting which will be visible behind stained glass and water (and everything else)
+calculate lighting which will be visible behind stained glass and water (and everything else)
 
 */
 
@@ -72,11 +72,10 @@ void main() {
 	
 	vec3 blocklight = lightmap.r * lightmap.r * blocklightColor * (1.0-0.7*dayFactor);
 	vec3 skylight = lightmap.g * mix(skylightNightColor, skylightColor, dayFactor);
-	vec3 ambient = ambientColor;
 	
 	vec3 shadow = getPCSSShadow(shadowClipPos);
 	vec3 sunlight = clamp(dot(worldLightVector, normal), 0.0, 1.0) * lightmap.g * shadow * (1.0-0.8*rainStrength); // clamp dot product to not get negative sunlight (its impossible irl duh unless we discover black holes in minecraft)
-	vec3 light = blocklight + skylight + ambient + mix(moonlightColor, sunColor, dayFactor) * sunlight;	
+	vec3 light = blocklight + skylight + ambientColor + mix(moonlightColor, sunColor, dayFactor) * sunlight;	
 
 	color.rgb *= light;
 }

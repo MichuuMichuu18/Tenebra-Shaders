@@ -1,5 +1,13 @@
 #version 330 compatibility
 
+/*
+
+composite6.fsh
+
+Applying FXAA (oh please replace it with TAA)
+
+*/
+
 uniform sampler2D colortex0;
 
 uniform float viewWidth;
@@ -9,12 +17,12 @@ in vec2 texcoord;
 
 #define FXAA
 // FXAA pixel span, 8.0 - sharp but sometimes not smooth enough, 16.0 - smooth but sometimes not sharp enough
-#define FXAA_SPAN_MAX	     8.0
+#define FXAA_SPAN_MAX	     16.0
 #define FXAA_EDGE_THRESHOLD  0.02
 #define FXAA_MIN_LUMA	     0.0001
 
 // you probably don't want to touch these
-#define FXAA_REDUCE_MUL	 (1.0 / 10.0)
+#define FXAA_REDUCE_MUL	 (1.0 / 16.0)
 #define FXAA_REDUCE_MIN	 (1.0 / 128.0)
 
 #include "/lib/util.glsl"
@@ -28,7 +36,7 @@ void main() {
 	#ifdef FXAA
 	float lumaM  = luminance(color.rgb);
 
-	// early skip if pixel too dark
+	// early skip if current pixel is too dark
 	if(lumaM > FXAA_MIN_LUMA) {
 		vec2 texel = vec2(1.0 / viewWidth, 1.0 / viewHeight);
 
@@ -61,8 +69,8 @@ void main() {
 			dir *= fxaaStrength;
 
 			// fetch weighted samples for blur
-			vec2 o1 = dir * -0.1666; // (1.0/3.0 - 0.5)
-			vec2 o2 = dir * 0.1666; // (2.0/3.0 - 0.5)
+			vec2 o1 = dir * -0.16666; // (1.0/3.0 - 0.5)
+			vec2 o2 = dir * 0.16666; // (2.0/3.0 - 0.5)
 			vec2 o3 = dir * -0.5;
 			vec2 o4 = dir * 0.5;
 

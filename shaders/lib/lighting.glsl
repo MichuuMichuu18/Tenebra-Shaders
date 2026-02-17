@@ -5,7 +5,7 @@
 
 const float sunPathRotation = -35.0;
 
-#define DAY_CURVE 0.333 // higher value gives us more smooth day/night transition (up to 1.0) and can make daytime and nighttime overlap too much
+#define DAY_CURVE 0.4 // higher value gives us more smooth day/night transition (up to 1.0) and can make daytime and nighttime overlap too much
 
 // Energy levels (HDR, linear space)
 const vec3 blocklightColor      = vec3(4.0, 2.2, 1.0);

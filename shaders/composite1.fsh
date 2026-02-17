@@ -1,5 +1,13 @@
 #version 330 compatibility
 
+/*
+
+deferred1.fsh/composite1.fsh
+
+Fog blending
+
+*/
+
 uniform sampler2D colortex0;
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -27,7 +35,7 @@ in vec2 texcoord;
 layout(location = 0) out vec4 color;
 
 #define FOG
-#define FOG_DENSITY 0.2
+#define FOG_DENSITY 0.2 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #define PREETHAM_SKY
 

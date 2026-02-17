@@ -35,15 +35,14 @@ layout(location = 2) out vec4 encodedNormal;
 
 #include "/lib/util.glsl"
 
-#define WATER_REFLECTIONS
-#define VANILLA_WATER
+//#define VANILLA_WATER
 
 void main() {
 	#ifndef VANILLA_WATER
 	lightmapData = vec4(lmcoord, 0.0, 1.0);
 	encodedNormal = vec4(normal.rgb * 0.5 + 0.5, 1.0);
 	if(normal.a == 1.0) {
-		color = vec4(0.1, 0.45, 0.6, 0.3);
+		color = vec4(vec3(0.4, 0.7, 1.0)*glcolor.rgb, 0.2);
 		lightmapData.xy *= 0.5;
 		lightmapData.z = 1.0; // enable refraction/waves and other water special treatments in composite
 	} else {
