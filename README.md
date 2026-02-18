@@ -17,6 +17,8 @@ Backward compatibility (including OptiFine) is not a priority.
 - Multiple performance profiles
   (Low / Medium / High)
 - Volumetric light / god rays
+- Global illumination
+- Screen-space ambient occlusion
 
 ## Known issues
 - Occasional jitter in reflections
