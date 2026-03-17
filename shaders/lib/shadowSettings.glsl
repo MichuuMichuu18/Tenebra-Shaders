@@ -11,7 +11,7 @@ const bool shadowcolor0Nearest = false;
 
 const int shadowMapResolution = 1024; // [512 768 1024 2048 4096]
 const float shadowDistanceRenderMul = 1.0;
-const float ambientOcclusionLevel = 0.5;
+const float ambientOcclusionLevel = 0.0;
 
 #define SHADOW_PCSS_FILTERING
 

@@ -4,7 +4,7 @@
 
 composite.fsh
 
-calculate lighting and reflections visible on stained glass and water
+Lighting and reflections visible on stained glass and water
 
 */
 
@@ -53,6 +53,7 @@ layout(location = 0) out vec4 color;
 #include "/lib/util.glsl"
 #include "/lib/shadow.glsl"
 #include "/lib/lighting.glsl"
+#include "/lib/ssrSettings.glsl"
 #include "/lib/ssr.glsl"
 
 #define WATER_REFLECTIONS
@@ -118,7 +119,7 @@ void main() {
 		vec3 shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
 		vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);
 		
-		vec3 blocklight = lightmap.r * lightmap.r * blocklightColor * (1.0 - 0.7 * dayFactor);
+		vec3 blocklight = lightmap.r * lightmap.r * blocklightColor * (1.0 - 0.9 * dayFactor);
 		vec3 skylight = lightmap.g * mix(skylightNightColor, skylightColor, dayFactor);
 		vec3 shadow = getPCSSShadow(shadowClipPos);
 		vec3 sunlight = clamp(dot(worldLightVector, normal), 0.0, 1.0) * lightmap.g * shadow * (1.0 - 0.8 * rainStrength);
@@ -149,19 +150,19 @@ void main() {
 				// fade out at edges to prevent "popping"
 				vec2 edgeFade = smoothstep(vec2(0.0), vec2(0.15), hit.xy) * smoothstep(vec2(1.0), vec2(0.85), hit.xy);
 				ssrWeight = edgeFade.x * edgeFade.y;
-			} else {
-				#ifdef PREETHAM_SKY
-				skyReflection = calcSkyColorPreetham(reflectionDir) + (calcSunDisc(reflectionDir) * sunColor);
-				#else
-				skyReflection = calcSkyColor(reflect(viewDir, waterNormalView)) * 1.5;
-				#endif
-
-				#ifdef CLOUDS_2D
-				vec3 cloudPos = normalize(gMVI * reflectionDir);
-				vec4 clouds = renderClouds(cloudPos, false);
-				skyReflection = mix(skyReflection, clouds.rgb, clouds.a);
-				#endif
 			}
+			
+			#ifdef PREETHAM_SKY
+			skyReflection = calcSkyColorPreetham(reflectionDir) + (calcSunDisc(reflectionDir) * sunColor);
+			#else
+			skyReflection = calcSkyColor(reflect(viewDir, waterNormalView)) * 1.5;
+			#endif
+
+			#ifdef CLOUDS_2D
+			vec3 cloudPos = normalize(gMVI * reflectionDir);
+			vec4 clouds = renderClouds(cloudPos, false);
+			skyReflection = mix(skyReflection, clouds.rgb, clouds.a);
+			#endif
 		}
 
 		color.rgb = mix(color.rgb, mix(pow(skyReflection, vec3(2.2)), reflectionColor, ssrWeight), fresnel);

@@ -9,7 +9,7 @@ Backward compatibility (including OptiFine) is not a priority.
 - Natural lighting
 - Subtle post-processing
 - Reflections on water and glass
-- Soft shadows and fog
+- Soft shadows with reflected light and fog
 
 ## Planned
 - Post-processing
@@ -17,8 +17,6 @@ Backward compatibility (including OptiFine) is not a priority.
 - Multiple performance profiles
   (Low / Medium / High)
 - Volumetric light / god rays
-- Global illumination
-- Screen-space ambient occlusion
 
 ## Known issues
 - Occasional jitter in reflections

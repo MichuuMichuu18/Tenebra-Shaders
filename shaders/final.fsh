@@ -32,6 +32,7 @@ in vec2 texcoord;
 /*
 const int colortex0Format = RGB16F;
 const int colortex5Format = RGB16F;
+const int colortex6Format = RGB16F;
 */
 
 #include "/lib/util.glsl"

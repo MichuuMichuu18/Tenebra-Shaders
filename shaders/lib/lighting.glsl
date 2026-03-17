@@ -6,12 +6,15 @@ const float sunPathRotation = -35.0;
 #define DAY_CURVE 0.33
 
 // Energy levels
-const vec3 blocklightColor      = vec3(4.5, 1.8, 0.4); 
-const vec3 skylightColor        = vec3(1.0, 1.4, 1.8); 
-const vec3 skylightNightColor   = vec3(0.02, 0.03, 0.05); 
-const vec3 sunlightColor        = vec3(16.0, 15.5, 14.0); 
-const vec3 moonlightColor       = vec3(0.45, 0.55, 0.6);
-const vec3 ambientColor         = vec3(0.01, 0.01, 0.02); 
+const vec3 blocklightColor      = vec3(4.0, 1.5, 0.3) * 4.0; 
+
+const vec3 skylightColor        = vec3(0.9, 1.2, 1.6); 
+const vec3 skylightNightColor   = vec3(0.01, 0.015, 0.02); 
+
+const vec3 sunlightColor        = vec3(12.0, 11.5, 10.5); 
+const vec3 moonlightColor       = vec3(0.35, 0.45, 0.5);
+
+const vec3 ambientColor         = vec3(0.002, 0.002, 0.004);
 
 float getDayFactor() {
     float angle = sunAngle * 2.0 * 3.14159265;

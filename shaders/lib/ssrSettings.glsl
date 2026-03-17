@@ -1,0 +1,9 @@
+#ifndef SSRSETTINGS_GLSL
+#define SSRSETTINGS_GLSL
+
+#define SSR_MAX_STEPS 60
+#define SSR_STEP_SIZE 1.2
+#define SSR_STEP_EXPANSION 0.15
+#define SSR_SHARPENER_STEPS 4
+
+#endif

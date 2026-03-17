@@ -17,7 +17,7 @@ in vec2 texcoord;
 
 #define BLOOM
 
-// probably won't allow changing those settings
+// I probably won't allow changing those settings
 #define BLUR_RADIUS 10.0
 #define BLUR_STRENGTH 0.8
 #define BLOOM_CAP 20.0

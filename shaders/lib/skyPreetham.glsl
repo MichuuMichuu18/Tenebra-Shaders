@@ -59,7 +59,7 @@ vec3 calcSkyColorPreetham(vec3 viewDir) {
 	float sunView = dot(viewDir, sunDir);
 
 	// Base colors
-	vec3 zenithColor  = skyColor * 0.6;
+	vec3 zenithColor  = skyColor * 0.5;
 	vec3 horizonColor = calcFogColor(viewDir, sunDir);
 
 	// Vertical gradient
