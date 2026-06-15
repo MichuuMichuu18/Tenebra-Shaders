@@ -12,6 +12,10 @@ float saturate(float x) {
     return clamp(x, 0.0, 1.0);
 }
 
+vec3 saturate(vec3 x) {
+    return clamp(x, 0.0, 1.0);
+}
+
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
   vec4 homPos = projectionMatrix * vec4(position, 1.0);
   return homPos.xyz / homPos.w;

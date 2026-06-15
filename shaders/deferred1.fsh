@@ -49,22 +49,22 @@ layout(location = 0) out vec4 color;
 
 // custom SSR settings for SSGI to reduce performance impact
 #define SSR_MAX_STEPS 40
-#define SSR_STEP_SIZE 1.5
-#define SSR_STEP_EXPANSION 0.1
+#define SSR_STEP_SIZE 1.0
+#define SSR_STEP_EXPANSION 0.2
 #define SSR_SHARPENER_STEPS 0
 
 #include "/lib/ssr.glsl"
 
 // SSGI settings
 #define SSGI
-#define SSGI_SAMPLES 16
+#define SSGI_SAMPLES 3
 #define SSGI_RANGE 96.0 // damn thats a huge distance
 #define SSGI_STRENGTH 1.5
 #define SSGI_THICKNESS 2.0
 
 // SSAO settings
 #define SSAO
-#define SSAO_SAMPLES 16
+#define SSAO_SAMPLES 6
 #define SSAO_RADIUS 0.5
 #define SSAO_STRENGTH 1.0
 #define SSAO_BIAS 0.015
@@ -86,66 +86,91 @@ vec3 getHemisphereSample(vec2 noise, int i) {
 }
 
 void main() {
-	color = vec4(1.0);//texture(colortex0, texcoord);
-	float depth = texture(depthtex0, texcoord).r;
-	if (depth == 1.0) return; 
+    color = vec4(1.0);
+    float depth = texture(depthtex0, texcoord).r;
+    if (depth == 1.0) return; 
 
-	vec3 normal = normalize(texture(colortex2, texcoord).rgb * 2.0 - 1.0);
-	vec3 viewPos = screenToView(vec3(texcoord, depth));
-	float dither = interleavedGradientNoise(gl_FragCoord.xy);
-	mat3 tbn = getTBN(normal); 
+    vec3 normal = normalize(texture(colortex2, texcoord).rgb * 2.0 - 1.0);
+    vec3 viewPos = screenToView(vec3(texcoord, depth));
+    float dither = interleavedGradientNoise(gl_FragCoord.xy);
+    mat3 tbn = getTBN(normal); 
 
-	vec3 indirectLight = vec3(0.0);
-	float occlusion = 0.0;
+    vec3 indirectLight = vec3(0.0);
+    float occlusion = 0.0;
 
-	int samples = 0;
-	#if defined(SSGI) && defined(SSAO)
-		samples = max(SSGI_SAMPLES, SSAO_SAMPLES);
-	#elif defined(SSGI)
-		samples = SSGI_SAMPLES;
-	#elif defined(SSAO)
-		samples = SSAO_SAMPLES;
-	#endif
+    int samples = 0;
+    #if defined(SSGI) && defined(SSAO)
+        samples = max(SSGI_SAMPLES, SSAO_SAMPLES);
+    #elif defined(SSGI)
+        samples = SSGI_SAMPLES;
+    #elif defined(SSAO)
+        samples = SSAO_SAMPLES;
+    #endif
 
-	for(int i = 0; i < samples; i++) {
-		vec2 noise = vec2(fract(dither + float(i) * 0.15), fract(dither * 1.23 + float(i) * 0.31));
-		vec3 sampleDirView = mat3(gbufferModelView) * tbn * getHemisphereSample(noise, i);
+    for(int i = 0; i < samples; i++) {
+        vec2 noise = vec2(fract(dither + float(i) * 0.15), fract(dither * 1.23 + float(i) * 0.31));
+        
+        // Note: If your normal is already in view-space, you don't need mat3(gbufferModelView) here!
+        // Multiplying it again will scramble the directions when you rotate the camera.
+        vec3 sampleDirView = mat3(gbufferModelView) * tbn * getHemisphereSample(noise, i);
 
-		vec3 hit = rayTrace(viewPos + normal * 0.1, sampleDirView, dither);
+        // --- SSGI: Raymarched (Only run for the first 4 samples) ---
+        #ifdef SSGI
+        if (i < SSGI_SAMPLES) {
+            vec3 samplePosView = viewPos + normal * 0.1;
+            vec3 hit = rayTrace(samplePosView, sampleDirView, dither);
 
-		if(hit.z > 0.5) {
-			float hitSurfaceDepth = texture(depthtex0, hit.xy).r;
-			vec3 hitSurfaceViewPos = screenToView(vec3(hit.xy, hitSurfaceDepth));
-			float dist = distance(viewPos, hitSurfaceViewPos);
+            if(hit.z > 0.5) {
+                float hitSurfaceDepth = texture(depthtex0, hit.xy).r;
+                vec3 hitSurfaceViewPos = screenToView(vec3(hit.xy, hitSurfaceDepth));
+                float dist = distance(viewPos, hitSurfaceViewPos);
 
-			float expectedZ = viewPos.z + sampleDirView.z * dist;
-			if (abs(expectedZ - hitSurfaceViewPos.z) < SSGI_THICKNESS) {
-				#ifdef SSGI
-				if (i < SSGI_SAMPLES && dist < SSGI_RANGE) {
-					float falloff = clamp(1.0 - (dist / SSGI_RANGE), 0.0, 1.0);
-					indirectLight += normalize(texture(colortex0, hit.xy).rgb) * falloff * falloff;
-				}
-				#endif
+                float expectedZ = viewPos.z + sampleDirView.z * dist;
+                if (abs(expectedZ - hitSurfaceViewPos.z) < SSGI_THICKNESS && dist < SSGI_RANGE) {
+                    float falloff = clamp(1.0 - (dist / SSGI_RANGE), 0.0, 1.0);
+                    indirectLight += normalize(texture(colortex0, hit.xy).rgb) * falloff * falloff;
+                }
+            }
+        }
+        #endif
 
-				#ifdef SSAO
-				if (i < SSAO_SAMPLES && dist < SSAO_RADIUS) {
-					occlusion += smoothstep(0.0, 1.0, SSAO_RADIUS / dist);
-				}
-				#endif
-			}
-		}
-	}
+        // --- SSAO: Cheap Screen-Space Sample (Runs for all 8 samples) ---
+        #ifdef SSAO
+        if (i < SSAO_SAMPLES) {
+            // Push out into the hemisphere by the radius
+            vec3 aoSampleView = viewPos + (normal * SSAO_BIAS) + (sampleDirView * SSAO_RADIUS);
 
-	#ifdef SSAO
-	float ao = clamp(1.0 - (occlusion / float(SSAO_SAMPLES)) * SSAO_STRENGTH, 0.0, 1.0);
-	color.rgb *= mix(1.0, ao, 0.8); // direct AO
-	float aoIndirect = mix(1.0, ao, 0.4);
-	#else
-	float aoIndirect = 1.0;
-	#endif
+            // Project directly to screen (no raymarching needed!)
+            vec4 aoProj = gbufferProjection * vec4(aoSampleView, 1.0);
+            aoProj.xyz /= aoProj.w;
+            vec2 aoUV = aoProj.xy * 0.5 + 0.5;
 
-	#ifdef SSGI
-	indirectLight = (indirectLight / float(SSGI_SAMPLES)) * SSGI_STRENGTH;
-	color.rgb *= 1.0 + (min(indirectLight, vec3(5.0)) * aoIndirect);
-	#endif
+            // Only check if it didn't go off-screen
+            if (aoUV.x > 0.0 && aoUV.x < 1.0 && aoUV.y > 0.0 && aoUV.y < 1.0) {
+                float aoSurfaceDepth = texture(depthtex0, aoUV).r;
+                vec3 aoSurfaceView = screenToView(vec3(aoUV, aoSurfaceDepth));
+
+                float rangeCheck = smoothstep(0.0, 1.0, SSAO_RADIUS / abs(viewPos.z - aoSurfaceView.z));
+
+                // Is the real geometry closer to the camera than our sample point?
+                if (aoSurfaceView.z >= aoSampleView.z) {
+                    occlusion += 1.0 * rangeCheck;
+                }
+            }
+        }
+        #endif
+    }
+
+    #ifdef SSAO
+    float ao = clamp(1.0 - (occlusion / float(SSAO_SAMPLES)) * SSAO_STRENGTH, 0.0, 1.0);
+    color.rgb *= mix(1.0, ao, 0.8); // direct AO
+    float aoIndirect = mix(1.0, ao, 0.4);
+    #else
+    float aoIndirect = 1.0;
+    #endif
+
+    #ifdef SSGI
+    indirectLight = (indirectLight / float(SSGI_SAMPLES)) * SSGI_STRENGTH;
+    color.rgb *= 1.0 + (min(indirectLight, vec3(5.0)) * aoIndirect);
+    #endif
 }

@@ -45,18 +45,11 @@ layout(location = 0) out vec4 color;
 
 #define SSAO
 
-#ifdef (GI || SSAO)
+#if defined(GI) || defined(SSAO)
 
 vec3 filterGI(vec2 uv) {
-
 	float centerDepth = texture(depthtex0, uv).r;
-
-	// Correct normal decode (same as your main pass)
-	
-	// IMPORTANT
-	// DIVIDE UV BY THE SCALE OF GI BUFFER or omit it somehow
 	vec3 centerNormal = normalize((texture(colortex2, uv).rgb - 0.5) * 2.0);
-
 	vec2 texel = 1.0 / vec2(textureSize(colortex6, 0));
 
 	vec3 result = vec3(0.0);
@@ -73,13 +66,10 @@ vec3 filterGI(vec2 uv) {
 
 			vec3 sampleNormal = normalize((texture(colortex2, sampleUV/GI_SCALE).rgb - 0.5) * 2.0);
 
-			// Depth-based edge preservation
 			float depthDiff = abs(centerDepth - sampleDepth);
 			float depthWeight = exp(-depthDiff * 80.0);
 
-			// Normal similarity weight
 			float normalWeight = pow(max(dot(centerNormal, sampleNormal), 0.0), 1.0);
-
 			float weight = depthWeight * normalWeight;
 
 			result += sampleGI * weight;
@@ -102,7 +92,7 @@ void main() {
 		return;
 	}
 
-	#ifdef (GI || SSAO)
+#if defined(GI) || defined(SSAO)
 	// Apply filtered GI instead of raw
 	vec3 gi = filterGI(texcoord);
 	color.rgb *= gi;

@@ -36,7 +36,7 @@ float findBlockerDepth(vec3 uvz, int maxSamples, float noise) {
     float texel = 1.0 / float(shadowMapResolution);
 
     for(int i = 0; i < maxSamples; i++) {
-        vec2 offset = vogelDiskSample(i, maxSamples, interleavedGradientNoise(gl_FragCoord.xy + i * vec2(-1, 1))) * BLOCKER_RADIUS * texel;
+        vec2 offset = vogelDiskSample(i, maxSamples, noise) * BLOCKER_RADIUS * texel;
         float d = texture(shadowtex0, uvz.xy + offset).r;
         
         // use a tiny epsilon here to avoid self-blocking during the search
@@ -51,43 +51,35 @@ float findBlockerDepth(vec3 uvz, int maxSamples, float noise) {
 
 vec3 getPCSSShadow(vec4 clipPos) {
     float noise = interleavedGradientNoise(gl_FragCoord.xy);
-
-    // transform to NDC / view space
     float depth = texture(depthtex0, texcoord.xy).r;
     vec3 NDC = vec3(texcoord.xy, depth) * 2.0 - 1.0;
     vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDC);
     float distance = length(viewPos) / far;
-
     vec3 distortedPos = distortShadowClipPos(clipPos.xyz);
     vec3 uvz = distortedPos * 0.5 + 0.5;
     
     #ifdef SHADOW_PCSS_FILTERING
-
-    // blocker search
     int blockerSamples = int(mix(8.0, float(BLOCKER_SAMPLES), clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
     float blockerDepth = findBlockerDepth(uvz, blockerSamples, noise);
     
     if(blockerDepth < 0.0) return vec3(1.0); // fully lit
 
-    // penumbra calculation
     float penumbra = max(uvz.z - blockerDepth, 0.0) / blockerDepth;
     float filterRadius = clamp(penumbra * LIGHT_RADIUS, 1.0, 32.0);
     
-    // PCF Filtering
     int baseSamples = SHADOW_SAMPLES;
     int pcfSamples = int(mix(float(baseSamples), 16.0, clamp(distance / MAX_DISTANCE, 0.0, 1.0)));
 
     vec3 shadow = vec3(0.0);
     float weightTotal = 0.0;
-    
-    // calculate a bias that increases as our filter radius expands
     float dynamicBias = getDynamicBias(distance, penumbra);
 
     for(int i = 0; i < pcfSamples; i++) {
-        vec2 offset = vogelDiskSample(i, pcfSamples, interleavedGradientNoise(gl_FragCoord.xy + i * vec2(1, -1))) * filterRadius / float(shadowMapResolution);
+        vec2 diskSample = vogelDiskSample(i, pcfSamples, noise);
+        vec2 offset = diskSample * filterRadius / float(shadowMapResolution);
         
-        float w = exp(dot(offset, offset) * -2.0); 
-        
+        float w = exp(dot(diskSample, diskSample) * -2.0);
+
         shadow += getShadow(vec3(clamp(uvz.xy + offset, 0.0, 1.0), uvz.z), dynamicBias) * w;
         weightTotal += w;
     }
